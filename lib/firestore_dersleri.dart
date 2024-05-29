@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class FirestoreDersleri extends StatelessWidget {
   FirestoreDersleri({super.key});
 
-  FirebaseFirestore firestore= FirebaseFirestore.instance;
+  FirebaseFirestore _firestore= FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,15 @@ class FirestoreDersleri extends StatelessWidget {
     );
   }
 
-  veriEklemeAdd() async {}
+  veriEklemeAdd() async {
+   Map<String, dynamic> _eklenecekUser= Map<String, dynamic>();
+   _eklenecekUser["isim"]= "cahide";
+   _eklenecekUser["yas"]= 23;
+   _eklenecekUser["ogrenciMi"]= false;
+   await  _firestore.collection("users").add({
+
+   })
+  }
   
   veriEklemeSet() async{}
 }
