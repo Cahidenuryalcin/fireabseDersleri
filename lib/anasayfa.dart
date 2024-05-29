@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_dersleri/firestore_dersleri.dart';
 
 class AnaSayfa extends StatefulWidget {
   const AnaSayfa({super.key});
@@ -74,7 +75,7 @@ class _AnaSayfaState extends State<AnaSayfa> {
                     backgroundColor: Color.fromARGB(255, 105, 5, 94)),
                 child: Text(
                     style: TextStyle(color: Colors.white), "Kullaniciyi Sil")),
-                                ElevatedButton(
+            ElevatedButton(
                 onPressed: () {
                   changePassword();
                 },
@@ -82,7 +83,7 @@ class _AnaSayfaState extends State<AnaSayfa> {
                     backgroundColor: Color.fromARGB(255, 163, 144, 0)),
                 child: Text(
                     style: TextStyle(color: Colors.white), "Şifre Değiştir")),
-                    ElevatedButton(
+            ElevatedButton(
                 onPressed: () {
                   changeEmail();
                 },
@@ -90,11 +91,25 @@ class _AnaSayfaState extends State<AnaSayfa> {
                     backgroundColor: Color.fromARGB(255, 243, 95, 226)),
                 child: Text(
                     style: TextStyle(color: Colors.white), "Email Değiştir")),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FirestoreDersleri()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 102, 190, 0)),
+                child: Text(
+                    style: TextStyle(color: Colors.white),
+                    "Firestore İşlemleri")),
           ],
         ),
       ),
     );
   }
+
 
   void createUserEmailAndPassword() async {
     try {
@@ -120,70 +135,65 @@ class _AnaSayfaState extends State<AnaSayfa> {
       var _userCredantial =
           auth.signInWithEmailAndPassword(email: _email, password: _password);
       debugPrint(_userCredantial.toString());
-       debugPrint("kullanıcı giriş yapti");
+      debugPrint("kullanıcı giriş yapti");
     } catch (e) {
       //debugPrint(e.toString());
-       debugPrint("önce kayit ol");
+      debugPrint("önce kayit ol");
     }
   }
 
   void signOutUser() async {
     await auth.signOut();
-     debugPrint("cikis yapildi");
+    debugPrint("cikis yapildi");
   }
-  
-  void deleteUser() async{
-    if (auth.currentUser!= null) {
-       await auth.currentUser!.delete();
-       debugPrint("kullanıcı silindi");
-    }else{
+
+  void deleteUser() async {
+    if (auth.currentUser != null) {
+      await auth.currentUser!.delete();
+      debugPrint("kullanıcı silindi");
+    } else {
       debugPrint("önce kayit ol ");
     }
-   
   }
-  
-  void changePassword() async{
+
+  void changePassword() async {
     try {
       await auth.currentUser!.updatePassword("cahide123");
       await auth.signOut();
-    } on FirebaseAuthException catch(e){
-      if (e.code== "requires-recent-login") {
+    } on FirebaseAuthException catch (e) {
+      if (e.code == "requires-recent-login") {
         debugPrint("reauthenticate olacak");
-        var credential = EmailAuthProvider.credential(email: _email, password: _password);
+        var credential =
+            EmailAuthProvider.credential(email: _email, password: _password);
         await auth.currentUser!.reauthenticateWithCredential(credential);
 
         await auth.currentUser!.updatePassword("cahide123");
         await auth.signOut();
         debugPrint("şifre güncellendi");
-        
       }
-    }catch (e) {
+    } catch (e) {
       debugPrint(e.toString());
     }
-    
   }
-  
+
   // email değiştirme çalışmiy. çok da önemli değil şu anlik.
-  void changeEmail() async{
+  void changeEmail() async {
     try {
       await auth.currentUser!.updateEmail("cnuryal@gmail.com");
       await auth.signOut();
-    } on FirebaseAuthException catch(e){
-      if (e.code== "requires-recent-login") {
+    } on FirebaseAuthException catch (e) {
+      if (e.code == "requires-recent-login") {
         debugPrint("reauthenticate olacak");
-        var credential = EmailAuthProvider.credential(email: _email, password: _password);
+        var credential =
+            EmailAuthProvider.credential(email: _email, password: _password);
         await auth.currentUser!.reauthenticateWithCredential(credential);
 
         await auth.currentUser!.updateEmail("cnuryal@gmail.com");
         await auth.signOut();
         debugPrint("Email güncellendi");
-        
       }
-    }catch (e) {
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
-
-
-
 }
