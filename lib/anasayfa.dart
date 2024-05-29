@@ -163,8 +163,26 @@ class _AnaSayfaState extends State<AnaSayfa> {
     
   }
   
-  void changeEmail() async {}
+  // email değiştirme çalışmiy. çok da önemli değil şu anlik.
+  void changeEmail() async{
+    try {
+      await auth.currentUser!.updateEmail("cnuryal@gmail.com");
+      await auth.signOut();
+    } on FirebaseAuthException catch(e){
+      if (e.code== "requires-recent-login") {
+        debugPrint("reauthenticate olacak");
+        var credential = EmailAuthProvider.credential(email: _email, password: _password);
+        await auth.currentUser!.reauthenticateWithCredential(credential);
 
+        await auth.currentUser!.updateEmail("cnuryal@gmail.com");
+        await auth.signOut();
+        debugPrint("Email güncellendi");
+        
+      }
+    }catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 
 
 
