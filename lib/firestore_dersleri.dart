@@ -8,10 +8,12 @@ class FirestoreDersleri extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     // IDler
     debugPrint(_firestore.collection("users").id);
-    debugPrint(_firestore.collection("users").doc().id); // add ile bir şey değiştirildiğinde farklı farklı idler oalrak gelerek değişiyor, her çalıştığında
+    debugPrint(_firestore
+        .collection("users")
+        .doc()
+        .id); // add ile bir şey değiştirildiğinde farklı farklı idler oalrak gelerek değişiyor, her çalıştığında
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +30,17 @@ class FirestoreDersleri extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red.shade300),
                 onPressed: () => veriEklemeSet(),
-                child: Text("Veri Ekleme Set"))
+                child: Text("Veri Ekleme Set")),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade300),
+                onPressed: () => veriSilme(),
+                child: Text("Veri Silme")),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade300),
+                onPressed: () => veriGuncelleme(),
+                child: Text("Veri Guncelleme")),
           ],
         ),
       ),
@@ -48,22 +60,22 @@ class FirestoreDersleri extends StatelessWidget {
   }
 
   veriEklemeSet() async {
-
-
     // veritabanında da ID değerini tutabilmek için
-    var _yediDocId= _firestore.collection("users").doc().id;
-    await _firestore.doc("users/$_yediDocId").set({
-      "isim": "menes",
-      "userID":_yediDocId
+    var _yediDocId = _firestore.collection("users").doc().id;
+    await _firestore
+        .doc("users/$_yediDocId")
+        .set({"isim": "menes", "userID": _yediDocId});
 
-    });
-
-
-
-
-     Map<String, dynamic> _kullaniciyaBaskaOzellikEkleme = Map<String, dynamic>();
-     _kullaniciyaBaskaOzellikEkleme["okul"]= "Bursa Uludag Universitesi";
-     _kullaniciyaBaskaOzellikEkleme["yas"]= FieldValue.increment(1); // counter gibi çalışıyor. yas degerini alıcak +1 yaparak yerine koyacak
-    await _firestore.doc("users/ixTTLxcObuTx4aPagpH0").set(_kullaniciyaBaskaOzellikEkleme,  SetOptions(merge: true));
+    Map<String, dynamic> _kullaniciyaBaskaOzellikEkleme =
+        Map<String, dynamic>();
+    _kullaniciyaBaskaOzellikEkleme["okul"] = "Bursa Uludag Universitesi";
+    _kullaniciyaBaskaOzellikEkleme["yas"] = FieldValue.increment(
+        1); // counter gibi çalışıyor. yas degerini alıcak +1 yaparak yerine koyacak
+    await _firestore
+        .doc("users/ixTTLxcObuTx4aPagpH0")
+        .set(_kullaniciyaBaskaOzellikEkleme, SetOptions(merge: true));
   }
+
+  veriSilme() async {}
+  veriGuncelleme() async {}
 }
