@@ -47,6 +47,11 @@ class FirestoreDersleri extends StatelessWidget {
                     backgroundColor: Colors.blue.shade300),
                 onPressed: () => veriGuncelleme(),
                 child: Text("Veri Guncelleme")),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange.shade300),
+                onPressed: () => veriOkuma(),
+                child: Text("Veri Oku One Time")),
           ],
         ),
       ),
@@ -109,8 +114,36 @@ class FirestoreDersleri extends StatelessWidget {
 */
 
     // update kullanarak silme gerçekleştirilebilmekte;
-    await _firestore.doc("users/ixTTLxcObuTx4aPagpH0").update({
-      "okul": FieldValue.delete()
-    });
+    await _firestore
+        .doc("users/ixTTLxcObuTx4aPagpH0")
+        .update({"okul": FieldValue.delete()});
+  }
+
+  veriOkuma() async{
+
+
+    //collection
+
+    var _userDocuments = await _firestore.collection("users").get();
+    debugPrint(_userDocuments.size.toString()); //çıktı = 1        // tehlikeli bir işlem. 100bin kayıt  varsa 100 bin değerini elde etmem için 100bin okuma yaoması gerekecek.
+    //ayrı bir collection ile bu işlemi tutarak da sayma işlemi yapılabilir
+    // her user oluşturulduğunda counter +1 olmasını ayarlamak gibi
+
+    debugPrint(_userDocuments.docs.length.toString()); //çıktı = 1
+
+    for (var eleman in _userDocuments.docs) {
+      debugPrint("Döküman ID ${eleman.id}"); // çıktı = Döküman ID jiNaSGcxDQXuwGObpdAX
+
+      Map userMap= eleman.data();
+      debugPrint(userMap["isim"]); // çıktı =  menes
+      
+
+    }
+
+
+    //dokuman
+
+    var _menesDoc = await _firestore.doc("users/jiNaSGcxDQXuwGObpdAX");
+
   }
 }
