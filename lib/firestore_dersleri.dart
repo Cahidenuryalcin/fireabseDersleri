@@ -1,6 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+//CRUD OPERATİON
+//CREATE
+//READ
+//UPDATE
+//DELETE
+
 class FirestoreDersleri extends StatelessWidget {
   FirestoreDersleri({super.key});
 
@@ -76,6 +82,35 @@ class FirestoreDersleri extends StatelessWidget {
         .set(_kullaniciyaBaskaOzellikEkleme, SetOptions(merge: true));
   }
 
-  veriSilme() async {}
-  veriGuncelleme() async {}
+  //documan kullanılır, elemanlar gezilir
+  // ixTTLxcObuTx4aPagpH0
+  veriGuncelleme() async {
+    // ilgili döküman varsa güncelleme işlemi yapacak
+    await _firestore.doc("users/ixTTLxcObuTx4aPagpH0").update({
+      "isim": "menescahide",
+      "ogrenciMi": false,
+      // olmayan bir alan varsa, özellik veya, onu oraya ekleyeme işlemi yapacak ör;
+      // set işleminden farkı, update işlemi olması için documanı var  olması şart
+      "medeniDurumu": "evli",
+
+      // map kısımlarında ayrı ayrı erişim değiştirme mümkün;
+      "adres.ilce": "balat",
+    });
+  }
+
+  //documan kullanılır, elemanlar gezilir
+  // ixTTLxcObuTx4aPagpH0
+  veriSilme() async {
+    // ilgili döküman varsa silme işlemi yapacak
+
+    /* await _firestore
+        .doc("users/ixTTLxcObuTx4aPagpH0").delete();
+        //herhangi bir parametre istemeyecek, menes kişisiin tüm verileri siinecek
+*/
+
+    // update kullanarak silme gerçekleştirilebilmekte;
+    await _firestore.doc("users/ixTTLxcObuTx4aPagpH0").update({
+      "okul": FieldValue.delete()
+    });
+  }
 }
