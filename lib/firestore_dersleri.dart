@@ -50,8 +50,20 @@ class FirestoreDersleri extends StatelessWidget {
             ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange.shade300),
-                onPressed: () => veriOkuma(),
+                onPressed: () => veriOkumaOneTime(),
                 child: Text("Veri Oku One Time")),
+
+                ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple.shade300),
+                onPressed: () => veriOkumaRealTime(),
+                child: Text("Veri Oku Real Time")),
+
+                ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey.shade300),
+                onPressed: () => streamDurdur(),
+                child: Text("Stream Durdur")),
           ],
         ),
       ),
@@ -119,7 +131,9 @@ class FirestoreDersleri extends StatelessWidget {
         .update({"okul": FieldValue.delete()});
   }
 
-  veriOkuma() async{
+
+
+  veriOkumaOneTime() async{
 
 
     //collection
@@ -143,7 +157,18 @@ class FirestoreDersleri extends StatelessWidget {
 
     //dokuman
 
-    var _menesDoc = await _firestore.doc("users/jiNaSGcxDQXuwGObpdAX");
+    var _menesDoc = await _firestore.doc("users/jiNaSGcxDQXuwGObpdAX").get();
+    debugPrint(_menesDoc.data().toString()); // çıktı =  {createdAt: Timestamp(seconds=1717274679, nanoseconds=767000000), ogrenciMi: true, renkler: [turkuaz, yesil], yas: 23, adres: {il: bursa, ilce: kestel}, isim: menes}
+    debugPrint(_menesDoc.data()!["adres"]["il"].toString()); // çıktı = bursa
+
+  }
+
+  veriOkumaRealTime() async{
+    //sürekli olarak dinleme
+
+  }
+
+  streamDurdur() async{
 
   }
 }
