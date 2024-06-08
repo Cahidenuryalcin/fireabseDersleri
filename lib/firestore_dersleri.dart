@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +13,8 @@ class FirestoreDersleri extends StatelessWidget {
   FirestoreDersleri({super.key});
 
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  StreamSubscription? _userSubscribe;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +33,7 @@ class FirestoreDersleri extends StatelessWidget {
         child: Column(
           children: [
             ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow.shade300),
                 onPressed: () => veriEklemeAdd(),
                 child: Text("Veri Ekleme Add")),
             ElevatedButton(
@@ -52,18 +56,26 @@ class FirestoreDersleri extends StatelessWidget {
                     backgroundColor: Colors.orange.shade300),
                 onPressed: () => veriOkumaOneTime(),
                 child: Text("Veri Oku One Time")),
-
-                ElevatedButton(
+            ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple.shade300),
                 onPressed: () => veriOkumaRealTime(),
                 child: Text("Veri Oku Real Time")),
-
-                ElevatedButton(
+            ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey.shade300),
                 onPressed: () => streamDurdur(),
                 child: Text("Stream Durdur")),
+                ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.brown.shade300),
+                onPressed: () => batchKavrami(),
+                child: Text("Batch Kavramı")),
+                ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lime.shade300),
+                onPressed: () => transactionKavrami(),
+                child: Text("Transaction Kavramı")),
           ],
         ),
       ),
@@ -131,44 +143,91 @@ class FirestoreDersleri extends StatelessWidget {
         .update({"okul": FieldValue.delete()});
   }
 
-
-
-  veriOkumaOneTime() async{
-
-
+  veriOkumaOneTime() async {
     //collection
 
     var _userDocuments = await _firestore.collection("users").get();
-    debugPrint(_userDocuments.size.toString()); //çıktı = 1        // tehlikeli bir işlem. 100bin kayıt  varsa 100 bin değerini elde etmem için 100bin okuma yaoması gerekecek.
+    debugPrint(_userDocuments.size
+        .toString()); //çıktı = 1        // tehlikeli bir işlem. 100bin kayıt  varsa 100 bin değerini elde etmem için 100bin okuma yaoması gerekecek.
     //ayrı bir collection ile bu işlemi tutarak da sayma işlemi yapılabilir
     // her user oluşturulduğunda counter +1 olmasını ayarlamak gibi
 
     debugPrint(_userDocuments.docs.length.toString()); //çıktı = 1
 
     for (var eleman in _userDocuments.docs) {
-      debugPrint("Döküman ID ${eleman.id}"); // çıktı = Döküman ID jiNaSGcxDQXuwGObpdAX
+      debugPrint(
+          "Döküman ID ${eleman.id}"); // çıktı = Döküman ID jiNaSGcxDQXuwGObpdAX
 
-      Map userMap= eleman.data();
+      Map userMap = eleman.data();
       debugPrint(userMap["isim"]); // çıktı =  menes
-      
-
     }
-
 
     //dokuman
 
     var _menesDoc = await _firestore.doc("users/jiNaSGcxDQXuwGObpdAX").get();
-    debugPrint(_menesDoc.data().toString()); // çıktı =  {createdAt: Timestamp(seconds=1717274679, nanoseconds=767000000), ogrenciMi: true, renkler: [turkuaz, yesil], yas: 23, adres: {il: bursa, ilce: kestel}, isim: menes}
+    debugPrint(_menesDoc
+        .data()
+        .toString()); // çıktı =  {createdAt: Timestamp(seconds=1717274679, nanoseconds=767000000), ogrenciMi: true, renkler: [turkuaz, yesil], yas: 23, adres: {il: bursa, ilce: kestel}, isim: menes}
     debugPrint(_menesDoc.data()!["adres"]["il"].toString()); // çıktı = bursa
-
   }
 
-  veriOkumaRealTime() async{
-    //sürekli olarak dinleme
+  veriOkumaRealTime() async {
+    //sürekli olarak dinleme (stream)
+    var _userStream = await _firestore.collection("users").snapshots();
+    //-  var _userDocStream = await _firestore.collection("users/jiNaSGcxDQXuwGObpdAX").snapshots();
+    //- _userSubscribe = _userDocStream.listen((event){ // listen olduğundan users in her birini getiriyor , ilk tıklamada (butona bağladığımız için)
+    //- debugPrint(event.data().toString());
 
+    _userSubscribe = _userStream.listen((event) {
+
+
+      //docChanges ile
+      /* event.docChanges.forEach((element) {
+        debugPrint(element.doc.data().toString()); //firestordan değişiklik yaptığımızda, bilgiyi güncelleyip konsola dökümanı yazar
+      });
+      */
+
+      // dog ile
+       event.docs.forEach((element) {
+        debugPrint(element.data().toString());
+      });
+      
+    });
+  }
+   
+  // olmadı. çöz
+  streamDurdur() async {
+    await _userSubscribe?.cancel();
   }
 
-  streamDurdur() async{
+
+  // ya hep ya hiç
+  // TOPLU YAPILAN İŞLEMLER
+
+  // 10 veri oluştururken bi hata sonucu 4 veri yazılıp 6 veri yazılamdığında, veri tutarsızlığı olur
+  // bunu engellemek için batch kullanılır. gidecekse 10 veri gider gidemeyecekse hiçbiri gitmez
+  
+  batchKavrami() async{
+   WriteBatch _batch = _firestore.batch();
+/******* */ // bu ikisi arasınd ayapılan işlemler ya hep ya hiç oluyor.
+  
+  CollectionReference _counterColRef = _firestore.collection("counter");
+
+/* batch ile eleman ekleme, bi hata olsaydı hiçbir şey eklemeyecekti, hata yoktu 99 tane counter ekledi firestora
+  for (var i = 0; i < 100; i++) {
+    var _yeniDoc = _counterColRef.doc();
+    _batch.set(_yeniDoc, {"sayac": ++i, "id":_yeniDoc.id });
+
+  }
+ */ 
+
+ var _counterDocs = await _counterColRef.get();
+
+
+/***** */
+   await _batch.commit();
+  }
+  transactionKavrami() async{
 
   }
 }
