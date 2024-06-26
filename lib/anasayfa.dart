@@ -196,4 +196,30 @@ class _AnaSayfaState extends State<AnaSayfa> {
       debugPrint(e.toString());
     }
   }
+
+  /**
+   * void changeEmail() async {
+  try {
+    // Email ve şifreyi kullanıcıdan almanız daha güvenli olur
+    var newEmail = "cnuryal@gmail.com";
+    await auth.currentUser!.updateEmail(newEmail);
+    await auth.signOut();
+    debugPrint("Email güncellendi ve çıkış yapıldı.");
+  } on FirebaseAuthException catch (e) {
+    if (e.code == "requires-recent-login") {
+      debugPrint("Reauthenticate gerekmektedir.");
+      var credential = EmailAuthProvider.credential(email: _email, password: _password);
+      await auth.currentUser!.reauthenticateWithCredential(credential);
+      await auth.currentUser!.updateEmail("cnuryal@gmail.com");
+      await auth.signOut();
+      debugPrint("Email güncellendi ve çıkış yapıldı.");
+    } else {
+      debugPrint("FirebaseAuthException: ${e.message}");
+    }
+  } catch (e) {
+    debugPrint("Exception: ${e.toString()}");
+  }
+}
+
+   */
 }
